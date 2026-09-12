@@ -6,7 +6,8 @@ cd "$CRATE"
 
 FIXTURE="ref/fixtures.safetensors"
 POLL_SECONDS="${RNGD_POLL_SECONDS:-5}"
-TIMEOUT="${RNGD_TIMEOUT:-1800}"
+TIMEOUT="${RNGD_TIMEOUT:-1800}"          # how long this script polls for the result
+JOB_TIMEOUT="${RNGD_JOB_TIMEOUT:-70}"    # server-side job limit (the Arena server caps it at 70)
 
 build=1
 wait_for_result=1
@@ -68,7 +69,7 @@ submit_output=$(furiosa-arena submit \
     "$staging/fixtures.safetensors" \
     --name "$job_name" \
     --entrypoint remote_entrypoint.sh \
-    --timeout "$TIMEOUT" 2>&1)
+    --timeout "$JOB_TIMEOUT" 2>&1)
 echo "$submit_output"
 
 job=$(printf '%s\n' "$submit_output" | sed -n 's/.*submitted job \([0-9][0-9]*\).*/\1/p' | head -1)
